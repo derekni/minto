@@ -1,0 +1,36 @@
+{
+  "name": "WorkToPlay",
+  "version": "1.0",
+  "description": "Enhance your productivity with next level work sessions!",
+  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "background": {
+    "scripts": ["js/background.js"]
+  },
+  "options_page": "html/options.html",
+  "browser_action": {
+    "default_title": "Set work timers to enhance productivity",
+    "default_popup": "html/popup.html",
+    "default_icon": "logos/green-clock-cycle.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "run_at": "document_start",
+      "js": ["js/content.js"]
+    }
+  ],
+  "web_accessible_resources": ["html/blocked.html"],
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+D",
+        "mac": "MacCtrl+D"
+      },
+      "description": "Opens options.html (for now it opens popup)"
+    }
+  },
+  "chrome_url_overrides": {
+    "newtab": "html/new-tab.html"
+  },
+  "manifest_version": 2
+}
