@@ -1,5 +1,5 @@
-var pomodoroButton = document.getElementById("pomodoro-button");
+var workButton = document.getElementById("work-button");
 
-pomodoroButton.addEventListener("click", function () {
-  console.log("begin pomodoro");
+workButton.addEventListener("click", function () {
+  console.log("begin work");
 });

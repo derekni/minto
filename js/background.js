@@ -3,8 +3,8 @@ var decrementIntervalId;
 
 // gets saved mints and starts updating
 chrome.storage.sync.get({ savedMints: 0 }, function (result) {
-  myMints = 1;
-  // myMints = result.savedMints + 2500;
+  // myMints = 1;
+  myMints = result.savedMints + 2500;
   decrementIntervalId = setInterval(function () {
     decrementMints();
   }, 6000);

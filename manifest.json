@@ -1,7 +1,7 @@
 {
-  "name": "WorkToPlay",
+  "name": "Minto",
   "version": "1.0",
-  "description": "Enhance your productivity with gamified points!",
+  "description": "Enhance your productivity with mints!",
   "permissions": ["storage", "<all_urls>"],
   "background": {
     "scripts": ["js/background.js"],
@@ -29,9 +29,6 @@
       },
       "description": "Opens options.html (for now it opens popup)"
     }
-  },
-  "chrome_url_overrides": {
-    "newtab": "html/new-tab.html"
   },
   "manifest_version": 2
 }
