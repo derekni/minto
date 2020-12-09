@@ -1,10 +1,11 @@
 {
   "name": "WorkToPlay",
   "version": "1.0",
-  "description": "Enhance your productivity with next level work sessions!",
-  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "description": "Enhance your productivity with gamified points!",
+  "permissions": ["storage", "<all_urls>"],
   "background": {
-    "scripts": ["js/background.js"]
+    "scripts": ["js/background.js"],
+    "persistent": false
   },
   "options_page": "html/options.html",
   "browser_action": {
@@ -19,7 +20,7 @@
       "js": ["js/content.js"]
     }
   ],
-  "web_accessible_resources": ["html/blocked.html"],
+  "web_accessible_resources": ["html/blocked.html", "html/no-mints.html"],
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
