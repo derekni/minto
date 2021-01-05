@@ -2,7 +2,7 @@
   "name": "Minto",
   "version": "1.0",
   "description": "Enhance your productivity with mints!",
-  "permissions": ["storage", "<all_urls>"],
+  "permissions": ["storage", "tabs", "alarms", "idle"],
   "background": {
     "scripts": ["js/background.js"],
     "persistent": false
@@ -11,7 +11,12 @@
   "browser_action": {
     "default_title": "Set work timers to enhance productivity",
     "default_popup": "html/popup.html",
-    "default_icon": "logos/green-clock-cycle.png"
+    "default_icon": "assets/img/mint.png"
+  },
+  "icons": {
+    "128": "assets/img/mint-128x128.png",
+    "16": "assets/img/mint-16x16.png",
+    "48": "assets/img/mint-48x48.png"
   },
   "content_scripts": [
     {
@@ -27,7 +32,7 @@
         "default": "Ctrl+D",
         "mac": "MacCtrl+D"
       },
-      "description": "Opens options.html (for now it opens popup)"
+      "description": "Opens popup"
     }
   },
   "manifest_version": 2

@@ -1,5 +1,5 @@
-var blockedSites = [];
-var blockButton = document.getElementById("block-button");
+let blockedSites = [];
+const blockButton = document.getElementById("block-button");
 
 // populates list with saved blocked sites
 chrome.storage.sync.get({ sites: [] }, function (result) {
@@ -10,8 +10,8 @@ chrome.storage.sync.get({ sites: [] }, function (result) {
 // adds list of blocked sites to html
 function populateBlockedSites() {
   for (i = 0; i < blockedSites.length; i++) {
-    var li = document.createElement("li");
-    var site = blockedSites[i];
+    const li = document.createElement("li");
+    const site = blockedSites[i];
     li.textContent = site;
     addDeleteButton(li);
     document.getElementById("blocked-sites").appendChild(li);
@@ -20,11 +20,11 @@ function populateBlockedSites() {
 
 // adds delete button for a row in the list
 function addDeleteButton(li) {
-  var button = document.createElement("button");
+  const button = document.createElement("button");
   button.innerHTML = "\u00D7";
   button.addEventListener("click", function () {
-    var parent = this.parentElement;
-    var site = parent.textContent.slice(0, -1);
+    const parent = this.parentElement;
+    const site = parent.textContent.slice(0, -1);
     deleteBlockedSite(site);
     parent.style.display = "none";
   });
@@ -33,7 +33,7 @@ function addDeleteButton(li) {
 
 // deletes a specified site from blocked sites and saves new list
 function deleteBlockedSite(site) {
-  for (var i = 0; i < blockedSites.length; i++) {
+  for (let i = 0; i < blockedSites.length; i++) {
     if (blockedSites[i] === site) {
       blockedSites.splice(i, 1);
       i--;
@@ -44,9 +44,9 @@ function deleteBlockedSite(site) {
 
 // clicking on block button will add a blocked site and save it
 blockButton.addEventListener("click", function blockSite() {
-  var li = document.createElement("li");
-  var siteName = document.getElementById("user-input").value;
-  var text = document.createTextNode(siteName);
+  const li = document.createElement("li");
+  const siteName = document.getElementById("user-input").value;
+  const text = document.createTextNode(siteName);
   li.appendChild(text);
   addDeleteButton(li);
   if (siteName === "") {
@@ -86,7 +86,7 @@ function saveSites() {
 
 // checks if valid URL (not perfect, simple regex)
 function isValidURL(site) {
-  var res = site.match(
+  const res = site.match(
     /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
   );
   return res !== null;

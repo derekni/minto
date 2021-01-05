@@ -1,40 +1,27 @@
-var id = chrome.runtime.id;
-var working = false;
+const id = chrome.runtime.id;
 
-checkStatus();
-
-// checks if website should be blocked or not
-// based on if user is working, or if user has mints
-function checkStatus() {
+// checks if user is allowed to access this site
+function checkSite() {
   chrome.storage.sync.get({ isWorking: false }, function (result) {
-    working = result.isWorking;
-    console.log("working status", working);
-    if (working) {
+    console.log(result.isWorking);
+    if (result.isWorking) {
       blockSite();
     } else {
       checkMints();
-      setInterval(checkMints(), 6000);
     }
   });
 }
+checkSite();
 
 // checks if current site is blocked, redirects if it is
 function blockSite() {
   chrome.storage.sync.get({ sites: [] }, function (result) {
-    let blockedSites = result.sites;
-    var currentSite = window.location.toString();
-    for (var i = 0; i < blockedSites.length; i++) {
+    const blockedSites = result.sites;
+    const currentSite = window.location.toString();
+    for (let i = 0; i < blockedSites.length; i++) {
       blockedSite = blockedSites[i];
       if (currentSite.includes(blockedSite)) {
         console.log("accessed a blocked site", blockedSite);
-        // location.replace('http://example.com')
-
-        // this requires document_idle, changes HTML on page
-        // document.documentElement.innerHTML = "";
-        // document.documentElement.innerHTML = "You shouldn't be here >:(";
-        // document.documentElement.scrollTop = 0;
-
-        // this redirects to blocked.html, can use document_start
         window.location.href = `chrome-extension://${id}/html/blocked.html`;
       }
     }
@@ -43,21 +30,20 @@ function blockSite() {
 
 // checks if have mints, redirect if not
 function checkMints() {
-  chrome.storage.sync.get({ hasMints: true }, function (result) {
-    console.log(result.hasMints);
-    let hasMints = result.hasMints;
-    if (!hasMints) {
+  chrome.storage.sync.get({ savedMints: 0 }, function (result) {
+    const savedMints = result.savedMints;
+    console.log("checking mints, current mints are", savedMints);
+    if (savedMints === 0) {
       window.location.href = `chrome-extension://${id}/html/no-mints.html`;
     }
   });
 }
 
-// listens for messages about tab switches
+// listens for messages about tab switches from background.js
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  // listen for messages sent from background.js
-  if (request.message === "check mints!") {
-    console.log("check for mints!"); // switched tabs
-    checkStatus();
+  if (request.message === "switched tabs") {
+    console.log("switched tabs, rechecking from content.js");
+    checkSite();
   }
   sendResponse(true);
 });
