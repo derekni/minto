@@ -1,65 +1,26 @@
 let myMints = 0;
-let decrementIntervalId = null;
-let isLocked = false;
+let blockedSites = [];
+let isWorking = false;
+const id = chrome.runtime.id;
+const blockUrl = `chrome-extension://${id}/html/blocked.html`;
 const chime = new Audio("../assets/sounds/chime.mp3");
 
-// gets saved mints and starts updating when extension starts
-chrome.storage.sync.get({ savedMints: 200, isWorking: false }, (result) => {
-  myMints = result.savedMints;
-  if (!result.isWorking) {
-    startDecrementingMints();
+// gets saved mints and blocked sites on extension start
+chrome.storage.sync.get(
+  { savedMints: 0, isWorking: false, blockedSites: [] },
+  (result) => {
+    myMints = result.savedMints;
+    blockedSites = result.blockedSites;
+    isWorking = result.isWorking;
+    toggleBadge(isWorking);
   }
-  toggleBadge(result.isWorking);
-});
-
-// creates interval to start decrementing mints
-function startDecrementingMints() {
-  clearInterval(decrementIntervalId);
-  decrementIntervalId = setInterval(() => {
-    decrementMints();
-  }, 6000);
-}
-
-// decrements mint value if not locked, sends msg to active tab if runs out
-function decrementMints() {
-  console.log("lock status is", isLocked);
-  console.log((Math.floor(new Date().getTime() / 1000) + "").toHHMMSS());
-  if (!isLocked) {
-    if (myMints <= 1) {
-      myMints = 0;
-      blockAllSites();
-      clearInterval(decrementIntervalId);
-      updateMints(myMints);
-    } else {
-      myMints -= 1;
-      updateMints(myMints);
-    }
-  }
-}
+);
 
 // adds mints
 function addMints(mintsToAdd) {
   myMints += mintsToAdd;
   updateMints(myMints);
 }
-
-String.prototype.toHHMMSS = function () {
-  var sec_num = parseInt(this, 10); // don't forget the second param
-  var hours = Math.floor(sec_num / 3600);
-  var minutes = Math.floor((sec_num - hours * 3600) / 60);
-  var seconds = sec_num - hours * 3600 - minutes * 60;
-
-  if (hours < 10) {
-    hours = "0" + hours;
-  }
-  if (minutes < 10) {
-    minutes = "0" + minutes;
-  }
-  if (seconds < 10) {
-    seconds = "0" + seconds;
-  }
-  return hours + ":" + minutes + ":" + seconds;
-};
 
 // update mints value to given parameter
 function updateMints(mintValue) {
@@ -68,29 +29,9 @@ function updateMints(mintValue) {
   });
 }
 
-// looks for active tabs to redirect when out of mints
-function blockAllSites() {
-  // query for active tab and redirect it
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    var activeTabId = tabs[0].id;
-    chrome.tabs.sendMessage(activeTabId, { message: "check mints!" }, () => {
-      console.log("sent message to tab, ran out of mints", activeTabId);
-    });
-  });
-}
-
-// checks for if user locks/unlocks computer
-chrome.idle.setDetectionInterval(15);
-chrome.idle.onStateChanged.addListener((state) => {
-  if (state === "locked") {
-    isLocked = true;
-  } else {
-    isLocked = false;
-  }
-});
-
-// sets working status in storage based on current value, adds badge if working
+// sets working status in storage and variable, updates badge
 function setWorkingStatus(working) {
+  isWorking = working;
   chrome.storage.sync.set({ isWorking: working }, () => {
     console.log("set working status in storage", working);
   });
@@ -108,34 +49,64 @@ function toggleBadge(working) {
   }
 }
 
-// check for tab switches, update pages accordingly
-chrome.tabs.onActivated.addListener((tab) => {
-  // sends message to switched tab
-  const tabId = tab.tabId;
-  chrome.tabs.sendMessage(tabId, { message: "switched tabs" }, () => {
-    console.log("switched tabs", tabId);
+// updates blocked sites
+function updateBlockedSites() {
+  chrome.storage.sync.get({ blockedSites: [] }, (result) => {
+    blockedSites = result.blockedSites;
   });
+}
+
+// redirects if current site is blocked and is working
+function blockSite(tabId, url) {
+  if (url && isWorking) {
+    for (let i = 0; i < blockedSites.length; i++) {
+      blockedSite = blockedSites[i];
+      if (url.includes(blockedSite)) {
+        console.log("accessed a blocked site", blockedSite);
+        chrome.tabs.update(tabId, { url: blockUrl }, (tab) => {
+          console.log("blocked site");
+        });
+      }
+    }
+  }
+}
+
+// check for tab switches
+chrome.tabs.onActivated.addListener((tab) => {
+  const tabId = tab.tabId;
+  console.log("switched tabs");
+  chrome.tabs.get(tabId, (tab) => {
+    const url = tab.url;
+    blockSite(tabId, url);
+    console.log("tab switch, tab info is", tab);
+  });
+});
+
+// check when new tab or page is opened
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+  console.log(tabId);
+  console.log(changeInfo);
+  console.log("updated tab");
+  const url = changeInfo.url;
+  blockSite(tabId, url);
 });
 
 // listen for messages from popup for toggling work sessions
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const message = request.greeting;
-  if (message === "stop work") {
+  if (message === "updated blocked sites") {
+    updateBlockedSites();
+  } else if (message === "stop work") {
     stopWork();
-    console.log("new working status is false");
   } else if (message === "pause work") {
     pauseWork();
-    console.log("paused work, working status is false");
   } else if (message === "resume work") {
     resumeWork();
-    console.log("resumed work, working status is true");
   } else if (message === "reset work") {
     resetWork();
-    console.log("reset work time");
   } else if (message.substring(0, 15) === "begin work for ") {
     const workTime = parseInt(message.substring(15));
     beginWork(workTime, workTime);
-    console.log("new working status is true", workTime);
   }
   sendResponse(true);
 });
@@ -146,17 +117,11 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   const workTime = parseInt(alarmName.substring(7));
   addMints(workTime * 10);
   setWorkingStatus(false);
-  startDecrementingMints();
   chime.play();
-
-  console.log("alarm of name", alarmName);
-  console.log("of time", workTime);
-  console.log("added", workTime, "mints");
 });
 
 // clears interval to decrement mints, sets alarm and working status
 function beginWork(workTime, alarmTime) {
-  clearInterval(decrementIntervalId);
   startWorkTimer(workTime, alarmTime);
   setWorkingStatus(true);
 }
@@ -164,7 +129,6 @@ function beginWork(workTime, alarmTime) {
 // starts decrementing mints and sets working status
 function stopWork() {
   chrome.alarms.clearAll();
-  startDecrementingMints();
   setWorkingStatus(false);
   chrome.storage.sync.set({ timeLeft: 0 });
 }
@@ -191,9 +155,7 @@ function pauseWork() {
     if (timeLeft > 0) {
       chrome.storage.sync.set({ timeLeft: timeLeft }, () => {
         chrome.alarms.clearAll();
-        startDecrementingMints();
         setWorkingStatus(false);
-        console.log("paused work, time left is", timeLeft);
       });
     } else {
       console.log("can't pause, times not valid");
@@ -209,7 +171,6 @@ function resumeWork() {
     if (timeLeft > 0) {
       beginWork(timeLeft, workLength);
       chrome.storage.sync.set({ timeLeft: 0 });
-      console.log("resumed work with time left as", timeLeft);
     } else {
       console.log("time left is 0, no work to resume");
     }

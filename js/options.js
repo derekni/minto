@@ -2,8 +2,8 @@ let blockedSites = [];
 const blockButton = document.getElementById("block-button");
 
 // populates list with saved blocked sites
-chrome.storage.sync.get({ sites: [] }, function (result) {
-  blockedSites = result.sites;
+chrome.storage.sync.get({ blockedSites: [] }, (result) => {
+  blockedSites = result.blockedSites;
   populateBlockedSites();
 });
 
@@ -42,8 +42,8 @@ function deleteBlockedSite(site) {
   saveSites();
 }
 
-// clicking on block button will add a blocked site and save it
-blockButton.addEventListener("click", function blockSite() {
+// blocks site from user input
+function blockSite() {
   const li = document.createElement("li");
   const siteName = document.getElementById("user-input").value;
   const text = document.createTextNode(siteName);
@@ -61,6 +61,11 @@ blockButton.addEventListener("click", function blockSite() {
     saveSites();
     document.getElementById("user-input").value = "";
   }
+}
+
+// clicking on block button will add a blocked site and save it
+blockButton.addEventListener("click", () => {
+  blockSite();
 });
 
 // pressing enter in text box will be same as clicking block button
@@ -74,14 +79,9 @@ document
 
 // saves blocked sites to chrome storage
 function saveSites() {
-  chrome.storage.sync.set(
-    {
-      sites: blockedSites,
-    },
-    function () {
-      console.log("sites saved as " + blockedSites);
-    }
-  );
+  chrome.storage.sync.set({ blockedSites: blockedSites }, function () {
+    chrome.runtime.sendMessage({ greeting: "updated blocked sites" });
+  });
 }
 
 // checks if valid URL (not perfect, simple regex)

@@ -2,7 +2,7 @@
   "name": "Minto",
   "version": "1.0",
   "description": "Enhance your productivity with mints!",
-  "permissions": ["storage", "tabs", "alarms", "idle"],
+  "permissions": ["storage", "tabs", "alarms"],
   "background": {
     "scripts": ["js/background.js"],
     "persistent": false
@@ -18,14 +18,7 @@
     "48": "assets/img/mint-48x48.png",
     "16": "assets/img/mint-16x16.png"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "run_at": "document_start",
-      "js": ["js/content.js"]
-    }
-  ],
-  "web_accessible_resources": ["html/blocked.html", "html/no-mints.html"],
+  "web_accessible_resources": ["html/blocked.html"],
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
