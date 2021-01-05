@@ -52,3 +52,23 @@ body {
 .settings:hover {
   color: #303030;
 }
+
+/* tabs */
+
+/* Style the tab buttons */
+.tablink {
+  background-color: #555;
+  color: white;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 16px;
+  width: 50%;
+  height: 50px;
+}
+
+/* Change background color of buttons on hover */
+.tablink:hover {
+  background-color: #777;
+}

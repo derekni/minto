@@ -109,7 +109,7 @@ function toggleBadge(working) {
 }
 
 // check for tab switches, update pages accordingly
-chrome.tabs.onActivated.addListener(function (tab) {
+chrome.tabs.onActivated.addListener((tab) => {
   // sends message to switched tab
   const tabId = tab.tabId;
   chrome.tabs.sendMessage(tabId, { message: "switched tabs" }, () => {
@@ -118,33 +118,30 @@ chrome.tabs.onActivated.addListener(function (tab) {
 });
 
 // listen for messages from popup for toggling work sessions
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const message = request.greeting;
-  (async () => {
-    if (message === "stop work") {
-      stopWork();
-      console.log("new working status is false");
-    } else if (message === "pause work") {
-      pauseWork();
-      console.log("paused work, working status is false");
-    } else if (message === "resume work") {
-      resumeWork();
-      console.log("resumed work, working status is true");
-    } else if (message === "reset work") {
-      resetWork();
-      console.log("reset work time");
-    } else if (message.substring(0, 15) === "begin work for ") {
-      const workTime = parseInt(message.substring(15));
-      beginWork(workTime);
-      console.log("new working status is true");
-    }
-    sendResponse(true);
-  })();
-  return true;
+  if (message === "stop work") {
+    stopWork();
+    console.log("new working status is false");
+  } else if (message === "pause work") {
+    pauseWork();
+    console.log("paused work, working status is false");
+  } else if (message === "resume work") {
+    resumeWork();
+    console.log("resumed work, working status is true");
+  } else if (message === "reset work") {
+    resetWork();
+    console.log("reset work time");
+  } else if (message.substring(0, 15) === "begin work for ") {
+    const workTime = parseInt(message.substring(15));
+    beginWork(workTime, workTime);
+    console.log("new working status is true", workTime);
+  }
+  sendResponse(true);
 });
 
 // alarm listener, adds mints when work session is over, begins decrementing
-chrome.alarms.onAlarm.addListener(function (alarm) {
+chrome.alarms.onAlarm.addListener((alarm) => {
   const alarmName = alarm.name;
   const workTime = parseInt(alarmName.substring(7));
   addMints(workTime * 10);
@@ -187,7 +184,7 @@ function startWorkTimer(time, alarmTime) {
 
 // pauses work, saves time remaining in chrome storage
 function pauseWork() {
-  chrome.storage.sync.get({ workEndTime: Date.now() }, function (result) {
+  chrome.storage.sync.get({ workEndTime: Date.now() }, (result) => {
     chrome.alarms.clearAll();
     const curTime = Date.now();
     const timeLeft = result.workEndTime - curTime;
@@ -206,7 +203,7 @@ function pauseWork() {
 
 // resumes work, gets time remaining from chrome storage
 function resumeWork() {
-  chrome.storage.sync.get({ timeLeft: 0, workLength: 25 }, function (result) {
+  chrome.storage.sync.get({ timeLeft: 0, workLength: 25 }, (result) => {
     const timeLeft = result.timeLeft / 60_000;
     const workLength = result.workLength;
     if (timeLeft > 0) {

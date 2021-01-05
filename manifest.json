@@ -15,8 +15,8 @@
   },
   "icons": {
     "128": "assets/img/mint-128x128.png",
-    "16": "assets/img/mint-16x16.png",
-    "48": "assets/img/mint-48x48.png"
+    "48": "assets/img/mint-48x48.png",
+    "16": "assets/img/mint-16x16.png"
   },
   "content_scripts": [
     {
