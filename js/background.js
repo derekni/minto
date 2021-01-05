@@ -32,9 +32,7 @@ function updateMints(mintValue) {
 // sets working status in storage and variable, updates badge
 function setWorkingStatus(working) {
   isWorking = working;
-  chrome.storage.sync.set({ isWorking: working }, () => {
-    console.log("set working status in storage", working);
-  });
+  chrome.storage.sync.set({ isWorking: working });
   toggleBadge(working);
 }
 
@@ -60,12 +58,8 @@ function updateBlockedSites() {
 function blockSite(tabId, url) {
   if (url && isWorking) {
     for (let i = 0; i < blockedSites.length; i++) {
-      blockedSite = blockedSites[i];
-      if (url.includes(blockedSite)) {
-        console.log("accessed a blocked site", blockedSite);
-        chrome.tabs.update(tabId, { url: blockUrl }, (tab) => {
-          console.log("blocked site");
-        });
+      if (url.includes(blockedSites[i])) {
+        chrome.tabs.update(tabId, { url: blockUrl });
       }
     }
   }
@@ -74,19 +68,14 @@ function blockSite(tabId, url) {
 // check for tab switches
 chrome.tabs.onActivated.addListener((tab) => {
   const tabId = tab.tabId;
-  console.log("switched tabs");
   chrome.tabs.get(tabId, (tab) => {
     const url = tab.url;
     blockSite(tabId, url);
-    console.log("tab switch, tab info is", tab);
   });
 });
 
 // check when new tab or page is opened
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  console.log(tabId);
-  console.log(changeInfo);
-  console.log("updated tab");
   const url = changeInfo.url;
   blockSite(tabId, url);
 });

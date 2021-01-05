@@ -53,9 +53,6 @@ body {
   color: #303030;
 }
 
-/* tabs */
-
-/* Style the tab buttons */
 .tablink {
   background-color: #777;
   color: white;
@@ -69,7 +66,10 @@ body {
   transition: transform 0.1s;
 }
 
-/* Change background color of buttons on hover */
 .tablink:hover {
   background-color: #333;
+}
+
+ol.shop-rewards {
+  list-style: none;
 }
