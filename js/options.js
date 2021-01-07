@@ -1,5 +1,6 @@
 let blockedSites = [];
 const blockButton = document.getElementById("block-button");
+const blockedSitesList = document.getElementById("blocked-sites");
 
 // populates list with saved blocked sites
 chrome.storage.sync.get({ blockedSites: [] }, (result) => {
@@ -14,7 +15,7 @@ function populateBlockedSites() {
     const site = blockedSites[i];
     li.textContent = site;
     addDeleteButton(li);
-    document.getElementById("blocked-sites").appendChild(li);
+    blockedSitesList.appendChild(li);
   }
 }
 

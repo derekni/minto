@@ -56,10 +56,8 @@ body {
 .tablink {
   background-color: #777;
   color: white;
-  float: left;
   border: none;
   outline: none;
-  cursor: pointer;
   font-size: 16px;
   width: 50%;
   height: 50px;
@@ -70,6 +68,60 @@ body {
   background-color: #333;
 }
 
-ol.shop-rewards {
+ul.shop-rewards {
+  width: 250px;
   list-style: none;
+  font-size: larger;
+  padding: 0;
+}
+
+.reward {
+  justify-content: space-between;
+}
+
+.reward:nth-child(odd) {
+  background-color: #f0f8ff;
+}
+
+.reward:nth-child(even) {
+  background-color: #e1e9f0;
+}
+
+.reward:hover {
+  background-color: #d2dae1;
+}
+
+.placeholder-reward {
+  background-color: #ffffff;
+}
+
+.mask {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup {
+  flex-direction: column;
+  width: 250px;
+  height: 200px;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+
+.popup-text {
+  word-wrap: break-word;
+  width: 150px;
+  text-align: center;
 }

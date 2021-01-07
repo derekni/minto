@@ -5,6 +5,8 @@ const id = chrome.runtime.id;
 const blockUrl = `chrome-extension://${id}/html/blocked.html`;
 const chime = new Audio("../assets/sounds/chime.mp3");
 
+console.log("background script loaded", new Date());
+
 // gets saved mints and blocked sites on extension start
 chrome.storage.sync.get(
   { savedMints: 0, isWorking: false, blockedSites: [] },
@@ -104,9 +106,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 chrome.alarms.onAlarm.addListener((alarm) => {
   const alarmName = alarm.name;
   const workTime = parseInt(alarmName.substring(7));
-  addMints(workTime * 10);
+  addMints(workTime);
   setWorkingStatus(false);
   chime.play();
+  console.log("alarm went off", alarm);
 });
 
 // clears interval to decrement mints, sets alarm and working status
@@ -127,12 +130,15 @@ function startWorkTimer(time, alarmTime) {
   const curTime = Date.now();
   const endTime = curTime + 60000 * time;
 
-  chrome.storage.sync.set({ workEndTime: endTime }, () => {
-    const alarmName = "workFor" + alarmTime;
-    chrome.alarms.create(alarmName, {
-      when: endTime,
-    });
-  });
+  chrome.storage.sync.set(
+    { workEndTime: endTime, workLength: alarmTime },
+    () => {
+      const alarmName = "workFor" + alarmTime;
+      chrome.alarms.create(alarmName, {
+        when: endTime,
+      });
+    }
+  );
 }
 
 // pauses work, saves time remaining in chrome storage
