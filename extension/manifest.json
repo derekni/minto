@@ -1,0 +1,40 @@
+{
+  "name": "Minto",
+  "version": "1.0",
+  "description": "Productivity rewarded by the minute. Set customizable Pomodoro timers to earn mints, then spend mints on rewards you create.",
+  "permissions": ["storage", "alarms", "contextMenus"],
+  "optional_permissions": ["tabs", "notifications"],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "options_page": "out/options.html",
+  "browser_action": {
+    "default_title": "Earn mints by working",
+    "default_popup": "out/popup.html",
+    "default_icon": "out/img/mint.png"
+  },
+  "icons": {
+    "128": "out/img/mint-128x128.png",
+    "48": "out/img/mint-48x48.png",
+    "16": "out/img/mint-16x16.png"
+  },
+  "web_accessible_resources": ["*.ttf"],
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+A",
+        "mac": "MacCtrl+S"
+      },
+      "description": "Opens popup."
+    },
+    "toggle-work": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "MacCtrl+D"
+      },
+      "description": "Begins work session, or pauses an ongoing session."
+    }
+  },
+  "manifest_version": 2
+}

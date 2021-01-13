@@ -1,0 +1,26 @@
+{
+  "name": "minto",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && next export -o extension/out",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "10.0.5",
+    "react": "17.0.1",
+    "react-beautiful-dnd": "^13.0.0",
+    "react-dom": "17.0.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.128",
+    "@types/node": "^14.14.20",
+    "@types/react": "^17.0.0",
+    "@types/react-beautiful-dnd": "^13.0.0",
+    "autoprefixer": "^10.2.1",
+    "postcss": "^8.2.4",
+    "tailwindcss": "^2.0.2",
+    "typescript": "^4.1.3"
+  }
+}
