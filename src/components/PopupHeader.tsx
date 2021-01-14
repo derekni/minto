@@ -6,10 +6,10 @@ const PopupHeader = () => {
   const { mints } = useContext(PopupContext);
 
   return (
-    <div className="flex justify-between bg-green-400 px-2 h-8 items-center">
+    <div className="flex justify-between bg-green-400 px-2 h-8">
       <div className="flex items-center">
-        <img className="mr-2" src="img/mint-24x24.png" />
-        <div className="text-base font-semibold text-white">{mints}</div>
+        <img className="mr-1.5" src="img/mint-24x24.png" />
+        <div className="text-lg font-semibold text-white">{mints}</div>
       </div>
       <button onClick={() => chrome.runtime.openOptionsPage()}>
         <SettingsIcon />

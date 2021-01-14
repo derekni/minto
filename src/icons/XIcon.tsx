@@ -1,7 +1,7 @@
 const XIcon = () => {
   return (
     <svg
-      className="w-5 h-5"
+      className="w-5 h-5 text-red-500"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"

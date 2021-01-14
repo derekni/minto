@@ -13,14 +13,14 @@ const Popup = () => {
   const { workState } = useContext(PopupContext);
 
   return (
-    <div className="flex flex-col h-64 w-64">
+    <div className="flex flex-col h-72 w-64">
       <PopupHeader />
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
         {currentTab === "work" && <WorkTab />}
         {currentTab === "shop" && <ShopTab />}
       </div>
 
-      <div className="flex h-10">
+      <div className="flex h-10 text-base">
         <Tab
           label="Work"
           onClick={() => setCurrentTab("work")}

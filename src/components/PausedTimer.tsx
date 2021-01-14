@@ -4,7 +4,7 @@ type Props = { pausedTimeLeft: number };
 
 const PausedTimer = ({ pausedTimeLeft }: Props) => {
   return (
-    <div className="text-4xl mb-2 font-mono">
+    <div className="text-5xl mt-1 mb-4 font-mono">
       {formatCountdownTime(pausedTimeLeft)}
     </div>
   );

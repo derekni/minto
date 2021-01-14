@@ -26,7 +26,7 @@ const EditableTimer = () => {
 
   return (
     <div>
-      <div className="flex items-center mb-4 text-4xl font-mono">
+      <div className="flex items-center mb-4 text-5xl font-mono">
         <input
           className="text-right w-28 rounded bg-transparent outline-none"
           type="text"

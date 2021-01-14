@@ -71,13 +71,13 @@ const BlockedSitesList = () => {
         </button>
       </div>
       {error && <div className="text-sm">{error}</div>}
-      <ul className="pl-2 text-base">
+      <ul className="pl-2 text-base w-64">
         {blockedSites.map((blockedSite) => {
           return (
-            <li key={blockedSite} className="">
-              {blockedSite}
+            <li key={blockedSite} className="flex justify-between mb-1">
+              <div>{blockedSite}</div>
               <button
-                className="ml-1"
+                className="ml-2"
                 onClick={() => {
                   const updatedBlockedSites = blockedSites.filter((site) => {
                     return site !== blockedSite;

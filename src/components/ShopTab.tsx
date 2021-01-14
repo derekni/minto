@@ -21,7 +21,11 @@ const ShopTab = () => {
     if (process.env.NODE_ENV === "development") {
       updateRewards([
         ...rewards,
-        { id: Math.floor(Math.random() * 1000), name: "New reward", price: 10 },
+        {
+          id: Math.floor(Math.random() * 1000),
+          name: "New reward",
+          price: 10,
+        },
       ]);
       return;
     }
@@ -58,12 +62,29 @@ const ShopTab = () => {
 
   if (isEditing) {
     return (
-      <div className="flex flex-col flex-1 bg-green-50 p-4 overflow-scroll">
-        <ul>
-          {rewards.map((reward) => {
-            return <EditableShopItem key={reward.id} reward={reward} />;
-          })}
-        </ul>
+      <div className="flex flex-col flex-1 bg-green-50 p-4">
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="rewards">
+            {(provided) => {
+              return (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  <ul>
+                    {rewards.map((reward, index) => {
+                      return (
+                        <EditableShopItem
+                          key={reward.id}
+                          reward={reward}
+                          index={index}
+                        />
+                      );
+                    })}
+                    {provided.placeholder}
+                  </ul>
+                </div>
+              );
+            }}
+          </Droppable>
+        </DragDropContext>
         <button
           className="border-gray-500 border-dashed border-2 p-1 rounded mb-2"
           onClick={addReward}
