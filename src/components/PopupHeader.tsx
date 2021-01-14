@@ -8,7 +8,7 @@ const PopupHeader = () => {
   return (
     <div className="flex justify-between bg-green-400 px-2 h-8">
       <div className="flex items-center">
-        <img className="mr-1.5" src="img/mint-24x24.png" />
+        <img className="mr-1 w-5 h-5" src="img/mint-128x128.png" />
         <div className="text-lg font-semibold text-white">{mints}</div>
       </div>
       <button onClick={() => chrome.runtime.openOptionsPage()}>

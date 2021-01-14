@@ -1,7 +1,7 @@
 {
   "name": "Minto",
-  "version": "1.0",
-  "description": "Productivity rewarded by the minute. Set customizable Pomodoro timers to earn mints, then spend mints on rewards you create.",
+  "version": "1.0.0",
+  "description": "Productivity rewarded by the minute. Set customizable Pomodoro timers to earn mints while working, then spend mints on rewards you create.",
   "permissions": ["storage", "alarms", "contextMenus"],
   "optional_permissions": ["tabs", "notifications"],
   "background": {
@@ -19,7 +19,6 @@
     "48": "out/img/mint-48x48.png",
     "16": "out/img/mint-16x16.png"
   },
-  "web_accessible_resources": ["*.ttf"],
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
