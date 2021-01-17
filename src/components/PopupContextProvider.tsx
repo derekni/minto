@@ -22,7 +22,7 @@ const PopupContextProvider = ({ children }: Props) => {
         workState: { status: "idle" },
         workLength: 25 * 60 * 1000,
         mints: 0,
-        rewards: [{ name: "Watch Netflix", price: 60 }],
+        rewards: [],
       },
       ({
         workState: _workState,
@@ -49,9 +49,6 @@ const PopupContextProvider = ({ children }: Props) => {
       }
       if (changes.workLength !== undefined) {
         setWorkLength(changes.workLength.newValue);
-      }
-      if (changes.rewards !== undefined) {
-        setRewards(changes.rewards.newValue);
       }
     };
     chrome.storage.onChanged.addListener(storageListener);
@@ -90,6 +87,7 @@ const PopupContextProvider = ({ children }: Props) => {
       setRewards(rewards);
       return;
     }
+    setRewards(rewards);
     chrome.storage.sync.set({ rewards });
   };
 

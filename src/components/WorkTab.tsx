@@ -57,12 +57,12 @@ const WorkTab = () => {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-green-50">
+    <div className="flex flex-col flex-1 items-center justify-center bg-gray-50">
       {workState.status === "idle" && (
         <>
           <EditableTimer />
           <button
-            className="bg-green-400 text-white font-semibold py-1 shadow hover:shadow-lg transition-all duration-200 w-24 rounded"
+            className="bg-green-500 text-white font-semibold py-1 shadow hover:shadow-lg transition-all duration-200 w-24 rounded"
             onClick={startWork}
           >
             Work

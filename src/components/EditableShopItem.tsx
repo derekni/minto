@@ -41,16 +41,16 @@ const EditableShopItem = ({ reward, index }: Props) => {
                 <DragIcon />
               </div>
               <input
-                className="flex-1 mr-2"
+                className="flex-1 mr-2 border border-gray-200 rounded-sm pl-0.5"
                 value={rewardName}
                 onChange={(e) => setRewardName(e.target.value)}
               />
               <input
-                className="w-8 mr-2 text-right"
+                className="w-8 mr-2 text-right border border-gray-200 rounded-sm pr-0.5"
                 value={rewardPrice}
                 onChange={(e) => {
                   const value = Number(e.target.value);
-                  if (Number.isInteger(value)) {
+                  if (Number.isInteger(value) && value >= 0) {
                     setRewardPrice(value);
                   }
                 }}

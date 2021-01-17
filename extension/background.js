@@ -18,13 +18,13 @@ chrome.runtime.onInstalled.addListener((details) => {
       workState: { status: "idle" },
       blockedSites: [],
       workLength: 25 * 60 * 1000,
-      rewards: [{ id: -1, name: "Watch Netflix", price: 50 }],
+      rewards: [],
       nextRewardId: 0,
       tabPermissions: false,
       notificationPermissions: false,
       volume: 0.5,
     });
-    chrome.runtime.openOptionsPage();
+    window.open(`chrome-extension://${id}/out/welcome.html`);
   }
 });
 
@@ -55,6 +55,14 @@ chrome.storage.sync.get(
     tabPermissions = _tabPermissions;
     notificationPermissions = _notificationPermissions;
     volume = _volume;
+
+    if (workState.status === "working" && workState.workEndTime < Date.now()) {
+      chrome.alarms.getAll((alarms) => {
+        processAlarm(alarms[0]);
+        chrome.alarms.clearAll();
+      });
+    }
+
     toggleBadge(workState);
     updateTabPermissions(tabPermissions);
     chime.volume = volume;
@@ -73,8 +81,7 @@ const addMints = (mintsToAdd) => {
 const toggleBadge = (workState) => {
   if (workState.status === "working") {
     chrome.browserAction.setBadgeText({ text: "ON" });
-    // chrome.browserAction.setBadgeBackgroundColor({ color: "#4688F1" });
-    chrome.browserAction.setBadgeBackgroundColor({ color: "#00873E" });
+    chrome.browserAction.setBadgeBackgroundColor({ color: "#10b981" });
   } else {
     chrome.browserAction.setBadgeText({ text: "" });
   }
@@ -102,6 +109,9 @@ chrome.storage.onChanged.addListener((changes) => {
       });
     }
   }
+  if (changes.mints) {
+    mints = changes.mints.newValue;
+  }
   if (changes.tabPermissions) {
     tabPermissions = changes.tabPermissions.newValue;
     updateTabPermissions(tabPermissions);
@@ -127,6 +137,10 @@ chrome.storage.onChanged.addListener((changes) => {
 
 // alarm listener, adds mints when work session is over, begins decrementing
 chrome.alarms.onAlarm.addListener((alarm) => {
+  processAlarm(alarm);
+});
+
+const processAlarm = (alarm) => {
   const alarmName = alarm.name;
   const workTime = parseInt(alarmName.substring(7));
 
@@ -136,16 +150,14 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   toggleBadge(workState);
   if (notificationPermissions) {
     chrome.notifications.create({
-      iconUrl: "../out/img/mint.png",
+      iconUrl: "../out/img/mint-128x128.png",
       message: `Your work timer for ${workTime} minutes is over.`,
       title: "Break time!",
       type: "basic",
     });
   }
   chime.play();
-
-  console.log("alarm went off", alarm);
-});
+};
 
 chrome.commands.onCommand.addListener(function (command) {
   if (command === "toggle-work") {
@@ -171,8 +183,6 @@ const startWork = () => {
     const alarmName = "workFor" + Math.floor(workLength / 60_000);
     chrome.alarms.create(alarmName, { when: workEndTime });
     toggleBadge(workState);
-
-    console.log("started work, endtime is", workEndTime);
   });
 };
 
@@ -184,15 +194,18 @@ const pauseWork = () => {
   const pausedTimeLeft = workState.workEndTime - curTime;
   workState = { status: "paused", pausedTimeLeft };
   chrome.storage.sync.set({ workState });
-  console.log("paused time, time left is", pausedTimeLeft / 60_000);
 };
 
 // blocked sites with tab permissions
 
 const addBlockedSite = (info) => {
-  console.log(info, "info");
   const url = info.pageUrl;
-  const start = url.indexOf("://") + 3;
+  let start = null;
+  if (url.includes("www.")) {
+    start = url.indexOf("www.") + 3;
+  } else {
+    start = url.indexOf("://") + 3;
+  }
   const end = url.indexOf("/", start);
   const newBlockedSite = end ? url.substring(start, end) : url.substring(start);
   if (!blockedSites.includes(newBlockedSite)) {
@@ -225,7 +238,6 @@ const tabsUpdatedListener = (tabId, changeInfo) => {
 };
 
 const contextMenuListener = (info) => {
-  console.log("context menu info", info);
   if (info.menuItemId === "Block site") {
     addBlockedSite(info);
   }
@@ -237,10 +249,12 @@ const updateTabPermissions = (permissions) => {
     chrome.tabs.onUpdated.addListener(tabsUpdatedListener);
     chrome.contextMenus.onClicked.addListener(contextMenuListener);
 
-    chrome.contextMenus.create({
-      id: "Block site",
-      title: "Block this site when working",
-      documentUrlPatterns: ["http://*/*", "https://*/*"],
+    chrome.contextMenus.removeAll(() => {
+      chrome.contextMenus.create({
+        id: "Block site",
+        title: "Block this site when working",
+        documentUrlPatterns: ["http://*/*", "https://*/*"],
+      });
     });
   } else {
     chrome.tabs.onActivated.removeListener(tabsActivatedListener);

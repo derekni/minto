@@ -10,18 +10,28 @@ const EditableTimer = () => {
   const [secondsText, setSecondsText] = useState(
     String(Math.floor(workLength / 1_000) % 60).padStart(2, "0")
   );
-  const [errorText, setErrorText] = useState("");
+
+  const updateText = (workLength: number) => {
+    setMinutesText(String(Math.floor(workLength / 60_000)).padStart(2, "0"));
+    setSecondsText(
+      String(Math.floor(workLength / 1_000) % 60).padStart(2, "0")
+    );
+  };
 
   const verifyAndSave = () => {
     const minutes = Number(minutesText);
     const seconds = Number(secondsText);
 
-    if (Number.isInteger(minutes) && Number.isInteger(seconds)) {
-      setErrorText("");
+    if (
+      Number.isInteger(minutes) &&
+      Number.isInteger(seconds) &&
+      minutes >= 0 &&
+      seconds >= 0
+    ) {
       updateWorkLength((minutes * 60 + seconds) * 1_000);
       return;
     }
-    setErrorText("Invalid values for minutes or seconds");
+    updateText(workLength);
   };
 
   return (
@@ -49,7 +59,6 @@ const EditableTimer = () => {
           onBlur={verifyAndSave}
         />
       </div>
-      {errorText && <div>{errorText}</div>}
     </div>
   );
 };

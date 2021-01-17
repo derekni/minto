@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import BlockedSitesList from "../components/BlockedSitesList";
+import Head from "next/head";
 
 const options = () => {
   const [tabPermissions, setTabPermissions] = useState(true);
@@ -66,64 +67,76 @@ const options = () => {
   };
 
   if (isLoading) {
-    return <div className="bg-green-50 min-h-screen"></div>;
+    return (
+      <>
+        <Head>
+          <title>Options</title>
+        </Head>
+        <div className="bg-gray-50 min-h-screen"></div>
+      </>
+    );
   }
 
   return (
-    <div className="bg-green-50 min-h-screen p-10 pl-14">
-      <div className="font-bold text-4xl mb-4">Options</div>
-      <div className="font-semibold text-xl mb-1">Alarm Volume</div>
-      <input
-        type="range"
-        defaultValue={volume * 100}
-        onMouseUp={(e) => {
-          const element = e.target as HTMLInputElement;
-          const updatedVolume = Number(element.value) / 100;
-          setVolume(updatedVolume);
-          if (chime !== null) {
-            chime.volume = updatedVolume;
-            chime.load();
-            chime.play();
-          }
-          if (process.env.NODE_ENV === "development") {
-            return;
-          }
-          chrome.storage.sync.set({ volume: updatedVolume });
-        }}
-      ></input>
-      <div className="font-semibold text-xl mt-2">Permissions</div>
-      <div>
+    <>
+      <Head>
+        <title>Options</title>
+      </Head>
+      <div className="bg-gray-50 min-h-screen p-10 pl-14">
+        <div className="font-bold text-4xl mb-4">Options</div>
+        <div className="font-semibold text-xl mb-1">Alarm Volume</div>
         <input
-          id="notifications"
-          type="checkbox"
-          className="mr-2"
-          checked={notificationPermissions}
-          onChange={(e) => {
-            notificationPermissions
-              ? removeNotificationPermissions()
-              : requestNotificationPermissions();
+          type="range"
+          defaultValue={volume * 100}
+          onMouseUp={(e) => {
+            const element = e.target as HTMLInputElement;
+            const updatedVolume = Number(element.value) / 100;
+            setVolume(updatedVolume);
+            if (chime !== null) {
+              chime.volume = updatedVolume;
+              chime.load();
+              chime.play();
+            }
+            if (process.env.NODE_ENV === "development") {
+              return;
+            }
+            chrome.storage.sync.set({ volume: updatedVolume });
           }}
-        />
-        <label className="text-base" htmlFor="notifications">
-          Show notifications
-        </label>
+        ></input>
+        <div className="font-semibold text-xl mt-2">Permissions</div>
+        <div>
+          <input
+            id="notifications"
+            type="checkbox"
+            className="mr-2"
+            checked={notificationPermissions}
+            onChange={(e) => {
+              notificationPermissions
+                ? removeNotificationPermissions()
+                : requestNotificationPermissions();
+            }}
+          />
+          <label className="text-base" htmlFor="notifications">
+            Show notifications for alarms
+          </label>
+        </div>
+        <div>
+          <input
+            id="block-sites"
+            type="checkbox"
+            className="mr-2 mb-4"
+            checked={tabPermissions}
+            onChange={(e) => {
+              tabPermissions ? removeTabPermissions() : requestTabPermissions();
+            }}
+          />
+          <label className="text-base" htmlFor="block-sites">
+            Block sites when working
+          </label>
+        </div>
+        <BlockedSitesList />
       </div>
-      <div>
-        <input
-          id="block-sites"
-          type="checkbox"
-          className="mr-2 mb-4"
-          checked={tabPermissions}
-          onChange={(e) => {
-            tabPermissions ? removeTabPermissions() : requestTabPermissions();
-          }}
-        />
-        <label className="text-base" htmlFor="block-sites">
-          Block sites when working
-        </label>
-      </div>
-      {tabPermissions && <BlockedSitesList />}
-    </div>
+    </>
   );
 };
 

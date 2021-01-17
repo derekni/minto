@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import XIcon from "../icons/XIcon";
 
 const BlockedSitesList = () => {
-  const [blockedSites, setBlockedSites] = useState<string[]>([]);
+  const [blockedSites, setBlockedSites] = useState<string[]>([
+    "facebook.com",
+    "youtube.com",
+    "reddit.com",
+  ]);
   const [currentValue, setCurrentValue] = useState("");
   const [error, setError] = useState("");
   useEffect(() => {
@@ -49,11 +53,11 @@ const BlockedSitesList = () => {
       <div>
         <input
           type="text"
-          className="flex-row flex-1 mb-2 mr-2 py-1 pl-2 text-base"
+          className="flex-row flex-1 mb-2 mr-2 py-1 pl-2 text-base  border border-gray-200 rounded-sm"
           placeholder="Block a site"
           value={currentValue}
           onKeyUp={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && currentValue) {
               blockSite(currentValue);
             }
           }}
@@ -62,7 +66,10 @@ const BlockedSitesList = () => {
           }}
         />
         <button
-          className="bg-red-500 text-white text-base font-semibold w-20 py-1 shadow hover:shadow-lg transition-all duration-200 rounded"
+          disabled={currentValue === ""}
+          className="bg-red-500 text-white text-base font-semibold w-20 py-1 
+            shadow hover:shadow-lg transition-all duration-200 rounded 
+            disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           onClick={(e) => {
             blockSite(currentValue);
           }}
@@ -70,7 +77,7 @@ const BlockedSitesList = () => {
           Block
         </button>
       </div>
-      {error && <div className="text-sm">{error}</div>}
+      {error && <div className="text-sm ml-1 mb-1 text-red-500">{error}</div>}
       <ul className="pl-2 text-base w-64">
         {blockedSites.map((blockedSite) => {
           return (

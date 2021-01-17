@@ -32,7 +32,7 @@ const ShopTab = () => {
     chrome.storage.sync.get({ nextRewardId: 0 }, ({ nextRewardId }) => {
       updateRewards([
         ...rewards,
-        { id: nextRewardId, name: "New reward", price: 10 },
+        { id: nextRewardId, name: "New reward", price: 25 },
       ]);
       chrome.storage.sync.set({ nextRewardId: nextRewardId + 1 });
     });
@@ -62,7 +62,7 @@ const ShopTab = () => {
 
   if (isEditing) {
     return (
-      <div className="flex flex-col flex-1 bg-green-50 p-4">
+      <div className="flex flex-col flex-1 bg-gray-50 p-4">
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="rewards">
             {(provided) => {
@@ -104,7 +104,7 @@ const ShopTab = () => {
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-green-50 p-4">
+    <div className="flex flex-col flex-1 bg-gray-50 p-4">
       <ul>
         {rewards.map((reward) => {
           return (
@@ -140,7 +140,7 @@ const ShopTab = () => {
         <Modal>
           <div>
             <div className="mb-4">
-              Are you sure you want to purchase {popupState.reward.name} for
+              Are you sure you want to purchase {popupState.reward.name} for{" "}
               {popupState.reward.price} mints?
             </div>
             <div className="flex">

@@ -16,9 +16,7 @@ const ActiveTimer = ({ workEndTime }: Props) => {
   }, []);
 
   return (
-    <div className="text-5xl mt-1 mb-4 font-mono">
-      {formatCountdownTime(msLeft)}
-    </div>
+    <div className="text-5xl mb-4 font-mono">{formatCountdownTime(msLeft)}</div>
   );
 };
 
