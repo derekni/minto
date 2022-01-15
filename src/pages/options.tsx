@@ -7,6 +7,7 @@ const options = () => {
   const [notificationPermissions, setNotificationPermissions] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [chime, setChime] = useState<HTMLAudioElement | null>(null);
+  const [dailiesOn, setDailiesOn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     setChime(new Audio("sounds/chime.mp3"));
@@ -19,15 +20,18 @@ const options = () => {
         tabPermissions: false,
         notificationPermissions: false,
         volume: 0.5,
+        dailiesOn: false,
       },
       ({
         tabPermissions: _tabPermissions,
         notificationPermissions: _notificationPermissions,
         volume: _volume,
+        dailiesOn: _dailiesOn,
       }) => {
         setTabPermissions(_tabPermissions);
         setNotificationPermissions(_notificationPermissions);
         setVolume(_volume);
+        setDailiesOn(_dailiesOn);
         setIsLoading(false);
       }
     );
@@ -66,11 +70,16 @@ const options = () => {
     chrome.storage.sync.set({ notificationPermissions: false });
   };
 
+  const updateDailiesOn = (dailiesOn: boolean) => {
+    setDailiesOn(dailiesOn);
+    chrome.storage.sync.set({ dailiesOn });
+  };
+
   if (isLoading) {
     return (
       <>
         <Head>
-          <title>Options</title>
+          <title>Settings</title>
         </Head>
         <div className="bg-gray-50 min-h-screen"></div>
       </>
@@ -80,61 +89,92 @@ const options = () => {
   return (
     <>
       <Head>
-        <title>Options</title>
+        <title>Settings</title>
       </Head>
-      <div className="bg-gray-50 min-h-screen p-10 pl-14">
-        <div className="font-bold text-4xl mb-4">Options</div>
-        <div className="font-semibold text-xl mb-1">Alarm Volume</div>
-        <input
-          type="range"
-          defaultValue={volume * 100}
-          onMouseUp={(e) => {
-            const element = e.target as HTMLInputElement;
-            const updatedVolume = Number(element.value) / 100;
-            setVolume(updatedVolume);
-            if (chime !== null) {
-              chime.volume = updatedVolume;
-              chime.load();
-              chime.play();
-            }
-            if (process.env.NODE_ENV === "development") {
-              return;
-            }
-            chrome.storage.sync.set({ volume: updatedVolume });
-          }}
-        ></input>
-        <div className="font-semibold text-xl mt-2">Permissions</div>
-        <div>
+      <div className="bg-gray-50 flex flex-col min-h-screen py-9 px-14">
+        <div className="flex-1">
+          <div className="font-bold text-4xl mb-4">Settings</div>
+          <div className="font-semibold text-xl mb-1">Alarm Volume</div>
           <input
-            id="notifications"
-            type="checkbox"
-            className="mr-2"
-            checked={notificationPermissions}
-            onChange={(e) => {
-              notificationPermissions
-                ? removeNotificationPermissions()
-                : requestNotificationPermissions();
+            type="range"
+            defaultValue={volume * 100}
+            onMouseUp={(e) => {
+              const element = e.target as HTMLInputElement;
+              const updatedVolume = Number(element.value) / 100;
+              setVolume(updatedVolume);
+              if (chime !== null) {
+                chime.volume = updatedVolume;
+                chime.load();
+                chime.play();
+              }
+              if (process.env.NODE_ENV === "development") {
+                return;
+              }
+              chrome.storage.sync.set({ volume: updatedVolume });
             }}
-          />
-          <label className="text-base" htmlFor="notifications">
-            Show notifications for alarms
-          </label>
+          ></input>
+          <div className="font-semibold text-xl mt-2">Toggles</div>
+          <div>
+            <input
+              id="dailies"
+              type="checkbox"
+              className="mr-2"
+              checked={dailiesOn}
+              onChange={(e) => {
+                updateDailiesOn(e.target.checked);
+              }}
+            />
+            <label className="text-base" htmlFor="dailies">
+              Show dailies tab in popup
+            </label>
+          </div>
+          <div>
+            <input
+              id="notifications"
+              type="checkbox"
+              className="mr-2"
+              checked={notificationPermissions}
+              onChange={(e) => {
+                notificationPermissions
+                  ? removeNotificationPermissions()
+                  : requestNotificationPermissions();
+              }}
+            />
+            <label className="text-base" htmlFor="notifications">
+              Show alarm notifications in Notification Center
+            </label>
+          </div>
+          <div>
+            <input
+              id="block-sites"
+              type="checkbox"
+              className="mr-2 mb-4"
+              checked={tabPermissions}
+              onChange={(e) => {
+                tabPermissions
+                  ? removeTabPermissions()
+                  : requestTabPermissions();
+              }}
+            />
+            <label className="text-base" htmlFor="block-sites">
+              Block sites when working
+            </label>
+          </div>
+          <BlockedSitesList />
         </div>
-        <div>
-          <input
-            id="block-sites"
-            type="checkbox"
-            className="mr-2 mb-4"
-            checked={tabPermissions}
-            onChange={(e) => {
-              tabPermissions ? removeTabPermissions() : requestTabPermissions();
-            }}
-          />
-          <label className="text-base" htmlFor="block-sites">
-            Block sites when working
-          </label>
+        <div className="flex justify-center">
+          <a
+            href="https://www.buymeacoffee.com/derekni8"
+            target="_blank"
+            className=""
+          >
+            <img
+              src="img/green-coffee.png"
+              alt="Buy Me A Coffee"
+              className="h-12 w-42 "
+            />
+          </a>
         </div>
-        <BlockedSitesList />
       </div>
     </>
   );

@@ -26,7 +26,8 @@ const EditableTimer = () => {
       Number.isInteger(minutes) &&
       Number.isInteger(seconds) &&
       minutes >= 0 &&
-      seconds >= 0
+      seconds >= 0 &&
+      minutes + seconds > 0
     ) {
       updateWorkLength((minutes * 60 + seconds) * 1_000);
       return;

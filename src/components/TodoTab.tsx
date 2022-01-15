@@ -1,43 +1,40 @@
 import React, { useContext, useState } from "react";
 import PopupContext from "../contexts/PopupContext";
-import { Reward } from "../types";
+import { Todo } from "../types";
 import EditableListItem from "./EditableListItem";
 import Modal from "./Modal";
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 
-type PopupState =
-  | null
-  | { type: "confirmation"; reward: Reward }
-  | { type: "error"; reward: Reward };
+type PopupState = null | { type: "confirmation"; todo: Todo };
 
-const ShopTab = () => {
+const TodoTab = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [popupState, setPopupState] = useState<PopupState>(null);
-  const { rewards, updateRewards, mints, updateMints } =
-    useContext(PopupContext);
+  const { todos, updateTodos, mints, updateMints } = useContext(PopupContext);
 
-  const addReward = () => {
+  const addTodo = () => {
     if (process.env.NODE_ENV === "development") {
-      updateRewards([
-        ...rewards,
+      updateTodos([
+        ...todos,
         {
           id: Math.floor(Math.random() * 1_000),
-          name: "New reward",
-          price: 10,
+          name: "New todo",
+          value: 10,
         },
       ]);
       return;
     }
-    chrome.storage.sync.get({ nextRewardId: 0 }, ({ nextRewardId }) => {
-      updateRewards([
-        ...rewards,
-        { id: nextRewardId, name: "New reward", price: 25 },
-      ]);
-      chrome.storage.sync.set({ nextRewardId: nextRewardId + 1 });
+    chrome.storage.sync.get({ nextTodoId: 0 }, ({ nextTodoId }) => {
+      updateTodos([...todos, { id: nextTodoId, name: "New todo", value: 25 }]);
+      chrome.storage.sync.set({ nextTodoId: nextTodoId + 1 });
     });
   };
 
-  const reorder = (list: Reward[], startIndex: number, endIndex: number) => {
+  const deleteTodo = (todoId: number) => {
+    updateTodos(todos.filter((_todo) => _todo.id !== todoId));
+  };
+
+  const reorder = (list: Todo[], startIndex: number, endIndex: number) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
@@ -50,30 +47,30 @@ const ShopTab = () => {
       return;
     }
 
-    const newRewards = reorder(
-      rewards,
+    const newTodos = reorder(
+      todos,
       result.source.index,
       result.destination.index
     );
 
-    updateRewards(newRewards);
+    updateTodos(newTodos);
   };
 
   if (isEditing) {
     return (
       <div className="flex flex-col flex-1 bg-gray-50 p-4">
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="rewards">
+          <Droppable droppableId="todos">
             {(provided) => {
               return (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   <ul>
-                    {rewards.map((reward, index) => {
+                    {todos.map((todo, index) => {
                       return (
                         <EditableListItem
-                          key={reward.id}
-                          type={"reward"}
-                          item={reward}
+                          key={todo.id}
+                          type={"todo"}
+                          item={todo}
                           index={index}
                         />
                       );
@@ -87,9 +84,9 @@ const ShopTab = () => {
         </DragDropContext>
         <button
           className="border-gray-500 border-dashed border-2 p-1 rounded mb-2"
-          onClick={addReward}
+          onClick={addTodo}
         >
-          Add new reward
+          Add new todo
         </button>
         <button
           className="bg-green-500 font-semibold text-white p-1 rounded shadow hover:shadow-lg transition-all duration-200"
@@ -106,26 +103,19 @@ const ShopTab = () => {
   return (
     <div className="flex flex-col flex-1 bg-gray-50 p-4">
       <ul>
-        {rewards.map((reward) => {
+        {todos.map((todo) => {
           return (
-            <li key={reward.id}>
+            <li key={todo.id}>
               <button
                 className="flex justify-between mb-2 py-1 px-2 rounded w-full bg-white shadow hover:shadow-lg transition-all duration-200"
                 onClick={() => {
-                  if (mints < reward.price) {
-                    setPopupState({ type: "error", reward });
-                  } else {
-                    setPopupState({ type: "confirmation", reward });
-                  }
+                  setPopupState({ type: "confirmation", todo });
                 }}
               >
                 <div className="flex-1 truncate mr-2 text-left">
-                  {reward.name}
+                  {todo.name}
                 </div>
-                <div className="flex items-center">
-                  <img className="mr-0.5 w-3 h-3" src="img/mint-128x128.png" />
-                  <div>{reward.price}</div>
-                </div>
+                {/* <div>{todo.value}</div> */}
               </button>
             </li>
           );
@@ -137,14 +127,14 @@ const ShopTab = () => {
           setIsEditing(true);
         }}
       >
-        Edit rewards
+        Edit todos
       </button>
       {popupState?.type === "confirmation" && (
         <Modal>
           <div>
             <div className="mb-4">
-              Do you want to purchase {popupState.reward.name} for{" "}
-              {popupState.reward.price} mints?
+              Do you want to complete {popupState.todo.name} for{" "}
+              {popupState.todo.value} mints?
             </div>
             <div className="flex">
               <button
@@ -156,8 +146,9 @@ const ShopTab = () => {
               <button
                 className="bg-green-500 text-white p-1 rounded flex-1 ml-1"
                 onClick={() => {
+                  deleteTodo(popupState.todo.id);
                   setPopupState(null);
-                  updateMints(mints - popupState.reward.price);
+                  updateMints(mints + popupState.todo.value);
                 }}
               >
                 Yes
@@ -166,24 +157,8 @@ const ShopTab = () => {
           </div>
         </Modal>
       )}
-      {popupState?.type === "error" && (
-        <Modal>
-          <div className="flex flex-col items-center">
-            <div className="mb-4">
-              You need {popupState.reward.price} mints for{" "}
-              {popupState.reward.name}.
-            </div>
-            <button
-              onClick={() => setPopupState(null)}
-              className="bg-gray-500 text-white p-1 rounded w-1/2"
-            >
-              Okay
-            </button>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 };
 
-export default ShopTab;
+export default TodoTab;

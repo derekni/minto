@@ -5,6 +5,8 @@ let workState = { status: "idle" };
 let tabPermissions = false;
 let notificationPermissions = false;
 let volume = 0.5;
+let alarm = null;
+let workLength = 25 * 60 * 1_000;
 const id = chrome.runtime.id;
 const blockUrl = `chrome-extension://${id}/out/blocked.html`;
 const chime = new Audio("../out/sounds/chime.mp3");
@@ -17,9 +19,13 @@ chrome.runtime.onInstalled.addListener((details) => {
       lifetimeMints: 0,
       workState: { status: "idle" },
       blockedSites: [],
-      workLength: 25 * 60 * 1000,
+      workLength: 25 * 60 * 1_000,
       rewards: [],
       nextRewardId: 0,
+      todos: [],
+      nextTodoId: 0,
+      dailies: [],
+      nextDailyId: 0,
       tabPermissions: false,
       notificationPermissions: false,
       volume: 0.5,
@@ -35,6 +41,7 @@ chrome.storage.sync.get(
     lifetimeMints: 0,
     workState: { status: "idle" },
     blockedSites: [],
+    workLength: 25 * 60 * 1_000,
     tabPermissions: false,
     notificationPermissions: false,
     volume: 0.5,
@@ -44,6 +51,7 @@ chrome.storage.sync.get(
     lifetimeMints: _lifetimeMints,
     blockedSites: _blockedSites,
     workState: _workState,
+    workLength: _workLength,
     tabPermissions: _tabPermissions,
     notificationPermissions: _notificationPermissions,
     volume: _volume,
@@ -52,15 +60,20 @@ chrome.storage.sync.get(
     lifetimeMints = _lifetimeMints;
     blockedSites = _blockedSites;
     workState = _workState;
+    workLength = _workLength;
     tabPermissions = _tabPermissions;
     notificationPermissions = _notificationPermissions;
     volume = _volume;
 
-    if (workState.status === "working" && workState.workEndTime < Date.now()) {
-      chrome.alarms.getAll((alarms) => {
-        processAlarm(alarms[0]);
-        chrome.alarms.clearAll();
-      });
+    if (workState.status === "working") {
+      const timeLeft = workState.workEndTime - Date.now();
+      if (timeLeft <= 0) {
+        processAlarm(Math.floor(workLength / 60_000));
+      } else {
+        alarm = setTimeout(() => {
+          processAlarm(Math.floor(workLength / 60_000));
+        }, timeLeft);
+      }
     }
 
     toggleBadge(workState);
@@ -92,21 +105,27 @@ chrome.storage.onChanged.addListener((changes) => {
   if (changes.workState) {
     workState = changes.workState.newValue;
     toggleBadge(workState);
-    if (tabPermissions && workState.status === "working") {
-      chrome.tabs.query({ active: true }, (tabs) => {
-        for (let i = 0; i < tabs.length; i++) {
-          blockSite(tabs[i].id, tabs[i].url);
-        }
-      });
-    } else if (
-      tabPermissions &&
-      changes.workState.oldValue.status === "working"
-    ) {
-      chrome.tabs.query({ url: blockUrl }, (tabs) => {
-        for (let i = 0; i < tabs.length; i++) {
-          chrome.tabs.goBack(tabs[0].id);
-        }
-      });
+    if (workState.status === "working") {
+      const timeLeft = workState.workEndTime - Date.now();
+      alarm = setTimeout(() => {
+        processAlarm(Math.floor(workLength / 60_000));
+      }, timeLeft);
+      if (tabPermissions) {
+        chrome.tabs.query({ active: true }, (tabs) => {
+          for (let i = 0; i < tabs.length; i++) {
+            blockSite(tabs[i].id, tabs[i].url);
+          }
+        });
+      }
+    } else if (changes.workState.oldValue.status === "working") {
+      clearTimeout(alarm);
+      if (tabPermissions) {
+        chrome.tabs.query({ url: blockUrl }, (tabs) => {
+          for (let i = 0; i < tabs.length; i++) {
+            chrome.tabs.goBack(tabs[0].id);
+          }
+        });
+      }
     }
   }
   if (changes.mints) {
@@ -135,23 +154,15 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 });
 
-// alarm listener, adds mints when work session is over, begins decrementing
-chrome.alarms.onAlarm.addListener((alarm) => {
-  processAlarm(alarm);
-});
-
-const processAlarm = (alarm) => {
-  const alarmName = alarm.name;
-  const workTime = parseInt(alarmName.substring(7));
-
-  addMints(workTime);
+const processAlarm = (workLengthInMinutes) => {
+  addMints(workLengthInMinutes);
   workState = { status: "idle" };
   chrome.storage.sync.set({ workState });
   toggleBadge(workState);
   if (notificationPermissions) {
     chrome.notifications.create({
       iconUrl: "../out/img/mint-128x128.png",
-      message: `Your work timer for ${workTime} minutes is over.`,
+      message: `Your work timer for ${workLengthInMinutes} minutes is over.`,
       title: "Break time!",
       type: "basic",
     });
@@ -180,14 +191,11 @@ const startWork = () => {
     workState = { status: "working", workEndTime };
     chrome.storage.sync.set({ workState });
 
-    const alarmName = "workFor" + Math.floor(workLength / 60_000);
-    chrome.alarms.create(alarmName, { when: workEndTime });
     toggleBadge(workState);
   });
 };
 
 const pauseWork = () => {
-  chrome.alarms.clearAll();
   if (workState.status !== "working")
     throw new Error("cannot pause if not working");
   const curTime = Date.now();

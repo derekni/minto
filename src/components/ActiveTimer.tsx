@@ -8,7 +8,7 @@ const ActiveTimer = ({ workEndTime }: Props) => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setMsLeft(Math.max(0, workEndTime - Date.now()));
-    }, 1000);
+    }, 1_000);
 
     return () => {
       clearInterval(intervalId);

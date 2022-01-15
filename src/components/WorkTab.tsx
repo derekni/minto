@@ -11,11 +11,6 @@ const WorkTab = () => {
   const stopWork = () => {
     const updatedWorkState: WorkState = { status: "idle" };
     updateWorkState(updatedWorkState);
-
-    if (process.env.NODE_ENV === "development") {
-      return;
-    }
-    chrome.alarms.clearAll();
   };
 
   const pauseWork = () => {
@@ -26,15 +21,11 @@ const WorkTab = () => {
       pausedTimeLeft: updatedPausedTimeLeft,
     };
     updateWorkState(updatedWorkState);
-
-    if (process.env.NODE_ENV === "development") {
-      return;
-    }
-    chrome.alarms.clearAll();
   };
 
   const startWork = () => {
     let workEndTime: number | null = null;
+    console.log(workState);
     if (workState.status === "idle") {
       workEndTime = Date.now() + workLength;
     } else if (workState.status === "paused") {
@@ -46,12 +37,6 @@ const WorkTab = () => {
 
     const updatedWorkState: WorkState = { status: "working", workEndTime };
     updateWorkState(updatedWorkState);
-
-    if (process.env.NODE_ENV === "development") {
-      return;
-    }
-    const alarmName = "workFor" + Math.floor(workLength / 60_000);
-    chrome.alarms.create(alarmName, { when: workEndTime });
 
     window.close();
   };
