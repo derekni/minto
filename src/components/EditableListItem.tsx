@@ -36,13 +36,13 @@ const EditableReward = (reward: Reward, index: number) => {
     );
   };
 
-  const updateRewardValue = (rewardId: number, rewardValue: number) => {
+  const updateRewardPrice = (rewardId: number, rewardPrice: number) => {
     updateRewards(
       rewards.map((reward) => {
         if (reward.id !== rewardId) {
           return reward;
         }
-        return { ...reward, value: rewardValue };
+        return { ...reward, price: rewardPrice };
       })
     );
   };
@@ -58,7 +58,7 @@ const EditableReward = (reward: Reward, index: number) => {
       name={reward.name}
       onNameChange={updateRewardName}
       value={reward.price}
-      onValueChange={updateRewardValue}
+      onValueChange={updateRewardPrice}
       onDelete={deleteReward}
     />
   );

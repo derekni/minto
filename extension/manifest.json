@@ -1,7 +1,7 @@
 {
   "name": "Minto",
-  "version": "1.0.0",
-  "description": "Productivity rewarded by the minute. Earn a mint for every minute you work. Spend mints on rewards you create.",
+  "version": "1.0.1",
+  "description": "Productivity gamified by the minute. Earn a mint for every minute you work. Spend mints on rewards you create.",
   "permissions": ["storage", "contextMenus"],
   "optional_permissions": ["tabs", "notifications"],
   "background": {
