@@ -41,6 +41,7 @@ chrome.runtime.onInstalled.addListener((details) => {
           id: 0,
           name: "Work out",
           value: 25,
+          completed: false,
         },
       ],
       nextDailyId: 1,
@@ -120,7 +121,7 @@ const toggleBadge = (workState) => {
 
 // listens for changes to work state, tab permissions, and blocked sites
 chrome.storage.onChanged.addListener((changes) => {
-  if (changes.workState) {
+  if (changes.workState && changes.workState.oldValue) {
     workState = changes.workState.newValue;
     toggleBadge(workState);
     if (workState.status === "working") {
