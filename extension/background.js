@@ -18,7 +18,7 @@ chrome.runtime.onInstalled.addListener((details) => {
       mints: 0,
       lifetimeMints: 0,
       workState: { status: "idle" },
-      blockedSites: [],
+      blockedSites: ["facebook.com", "youtube.com", "reddit.com"],
       workLength: 25 * 60 * 1_000,
       rewards: [],
       nextRewardId: 0,
