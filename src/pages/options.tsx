@@ -87,7 +87,7 @@ const options = () => {
       <Head>
         <title>Settings</title>
       </Head>
-      <div className="bg-gray-50 flex flex-col min-h-screen py-9 px-14">
+      <div className="bg-gray-50 flex flex-col min-h-screen py-8 px-16">
         <div className="flex-1">
           <div className="font-bold text-4xl mb-4">Settings</div>
           <div className="font-semibold text-xl mb-1">Alarm Volume</div>
@@ -155,7 +155,7 @@ const options = () => {
           </div>
           <BlockedSitesList />
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center pt-2">
           <a
             href="https://www.buymeacoffee.com/derekni8"
             target="_blank"
@@ -164,7 +164,7 @@ const options = () => {
             <img
               src="img/green-coffee.png"
               alt="Buy Me A Coffee"
-              className="h-12 w-42 "
+              className="h-10 w-35"
             />
           </a>
         </div>

@@ -20,12 +20,30 @@ chrome.runtime.onInstalled.addListener((details) => {
       workState: { status: "idle" },
       blockedSites: ["facebook.com", "youtube.com", "reddit.com"],
       workLength: 25 * 60 * 1_000,
-      rewards: [],
-      nextRewardId: 0,
-      todos: [],
-      nextTodoId: 0,
-      dailies: [],
-      nextDailyId: 0,
+      rewards: [
+        {
+          id: 0,
+          name: "Watch TV",
+          price: 30,
+        },
+      ],
+      nextRewardId: 1,
+      todos: [
+        {
+          id: 0,
+          name: "Make your first todo",
+          value: 5,
+        },
+      ],
+      nextTodoId: 1,
+      dailies: [
+        {
+          id: 0,
+          name: "Work out",
+          value: 25,
+        },
+      ],
+      nextDailyId: 1,
       tabPermissions: false,
       notificationPermissions: false,
       volume: 0.5,
