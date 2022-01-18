@@ -11,10 +11,6 @@ const options = () => {
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     setChime(new Audio("sounds/chime.mp3"));
-    if (process.env.NODE_ENV === "development") {
-      setIsLoading(false);
-      return;
-    }
     chrome.storage.sync.get(
       {
         tabPermissions: false,
@@ -106,9 +102,6 @@ const options = () => {
                 chime.volume = updatedVolume;
                 chime.load();
                 chime.play();
-              }
-              if (process.env.NODE_ENV === "development") {
-                return;
               }
               chrome.storage.sync.set({ volume: updatedVolume });
             }}

@@ -10,9 +10,6 @@ const BlockedSitesList = () => {
   const [currentValue, setCurrentValue] = useState("");
   const [error, setError] = useState("");
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      return;
-    }
     chrome.storage.sync.get(
       { blockedSites: [] },
       ({ blockedSites: _blockedSites }) => {
@@ -33,9 +30,6 @@ const BlockedSitesList = () => {
       setBlockedSites(updatedBlockedSites);
       setCurrentValue("");
       setError("");
-      if (process.env.NODE_ENV === "development") {
-        return;
-      }
       chrome.storage.sync.set({ blockedSites: updatedBlockedSites });
     }
   };
@@ -90,9 +84,6 @@ const BlockedSitesList = () => {
                     return site !== blockedSite;
                   });
                   setBlockedSites(updatedBlockedSites);
-                  if (process.env.NODE_ENV === "development") {
-                    return;
-                  }
                   chrome.storage.sync.set({
                     blockedSites: updatedBlockedSites,
                   });

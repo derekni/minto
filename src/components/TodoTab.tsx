@@ -13,17 +13,6 @@ const TodoTab = () => {
   const { todos, updateTodos, mints, updateMints } = useContext(PopupContext);
 
   const addTodo = () => {
-    if (process.env.NODE_ENV === "development") {
-      updateTodos([
-        ...todos,
-        {
-          id: Math.floor(Math.random() * 1_000),
-          name: "New todo",
-          value: 10,
-        },
-      ]);
-      return;
-    }
     chrome.storage.sync.get({ nextTodoId: 0 }, ({ nextTodoId }) => {
       updateTodos([...todos, { id: nextTodoId, name: "New todo", value: 25 }]);
       chrome.storage.sync.set({ nextTodoId: nextTodoId + 1 });

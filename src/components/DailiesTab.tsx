@@ -14,18 +14,6 @@ const DailiesTab = () => {
     useContext(PopupContext);
 
   const addDaily = () => {
-    if (process.env.NODE_ENV === "development") {
-      updateDailies([
-        ...dailies,
-        {
-          id: Math.floor(Math.random() * 1_000),
-          name: "New daily",
-          value: 10,
-          completed: false,
-        },
-      ]);
-      return;
-    }
     chrome.storage.sync.get({ nextDailyId: 0 }, ({ nextDailyId }) => {
       updateDailies([
         ...dailies,

@@ -17,17 +17,6 @@ const ShopTab = () => {
     useContext(PopupContext);
 
   const addReward = () => {
-    if (process.env.NODE_ENV === "development") {
-      updateRewards([
-        ...rewards,
-        {
-          id: Math.floor(Math.random() * 1_000),
-          name: "New reward",
-          price: 10,
-        },
-      ]);
-      return;
-    }
     chrome.storage.sync.get({ nextRewardId: 0 }, ({ nextRewardId }) => {
       updateRewards([
         ...rewards,

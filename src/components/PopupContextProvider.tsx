@@ -17,10 +17,6 @@ const PopupContextProvider = ({ children }: Props) => {
   const [dailiesOn, setDailiesOn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      setIsLoading(false);
-      return;
-    }
     chrome.storage.sync.get(
       {
         workState: { status: "idle" },
@@ -86,61 +82,33 @@ const PopupContextProvider = ({ children }: Props) => {
   }, []);
 
   const updateWorkState = (workState: WorkState) => {
-    if (process.env.NODE_ENV === "development") {
-      setWorkState(workState);
-      return;
-    }
     chrome.storage.sync.set({ workState });
   };
 
   const updateMints = (mints: number) => {
-    if (process.env.NODE_ENV === "development") {
-      setMints(mints);
-      return;
-    }
     chrome.storage.sync.set({ mints });
   };
 
   const updateWorkLength = (workLength: number) => {
-    if (process.env.NODE_ENV === "development") {
-      setWorkLength(workLength);
-      return;
-    }
     chrome.storage.sync.set({ workLength });
   };
 
   const updateRewards = (rewards: Reward[]) => {
-    if (process.env.NODE_ENV === "development") {
-      setRewards(rewards);
-      return;
-    }
     setRewards(rewards);
     chrome.storage.sync.set({ rewards });
   };
 
   const updateTodos = (todos: Todo[]) => {
-    if (process.env.NODE_ENV === "development") {
-      setTodos(todos);
-      return;
-    }
     setTodos(todos);
     chrome.storage.sync.set({ todos });
   };
 
   const updateDailies = (dailies: Daily[]) => {
-    if (process.env.NODE_ENV === "development") {
-      setDailies(dailies);
-      return;
-    }
     setDailies(dailies);
     chrome.storage.sync.set({ dailies });
   };
 
   const updateCurrentDay = (currentDay: number) => {
-    if (process.env.NODE_ENV === "development") {
-      setCurrentDay(currentDay);
-      return;
-    }
     setCurrentDay(currentDay);
     chrome.storage.sync.set({ currentDay });
   };
