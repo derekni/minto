@@ -19,6 +19,7 @@ const Popup = () => {
       <PopupHeader
         shopClick={() => setCurrentTab("shop")}
         inShop={currentTab == "shop"}
+        isDisabled={workState.status === "working"}
       />
       <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
         {currentTab === "work" && <WorkTab />}
