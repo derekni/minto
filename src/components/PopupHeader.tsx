@@ -3,18 +3,13 @@ import PopupContext from "../contexts/PopupContext";
 import SettingsIcon from "../icons/SettingsIcon";
 import BriefcaseIcon from "../icons/BriefcaseIcon";
 import GoldBriefcaseIcon from "../icons/GoldBriefcaseIcon";
-import DisabledBriefcaseIcon from "../icons/DisabledBriefcaseIcon";
 
 const PopupHeader = (props: {
   shopClick: () => void;
   inShop: boolean;
-  isDisabled: boolean;
 }) => {
   const { mints } = useContext(PopupContext);
   let buttonClassName = "pr-1";
-  if (props.isDisabled) {
-    buttonClassName = "pr-1 cursor-not-allowed";
-  }
 
   return (
     <div className="flex justify-between bg-green-500 px-2.5 h-9">
@@ -26,10 +21,8 @@ const PopupHeader = (props: {
         <button
           onClick={props.shopClick}
           className={buttonClassName}
-          disabled={props.isDisabled}
         >
-          {!props.inShop && !props.isDisabled && <BriefcaseIcon />}
-          {!props.inShop && props.isDisabled && <DisabledBriefcaseIcon />}
+          {!props.inShop && <BriefcaseIcon />}
           {props.inShop && <GoldBriefcaseIcon />}
         </button>
         <button onClick={() => chrome.runtime.openOptionsPage()}>

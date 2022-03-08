@@ -192,6 +192,9 @@ const processAlarm = (workLengthInMinutes) => {
 chrome.commands.onCommand.addListener(function (command) {
   if (command === "toggle-work") {
     workState.status === "working" ? pauseWork() : startWork();
+  } else if (command == "reset-mints") {
+    mints = 0;
+    chrome.storage.sync.set({ mints });
   }
 });
 

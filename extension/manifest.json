@@ -33,6 +33,13 @@
         "mac": "MacCtrl+D"
       },
       "description": "Begins work session, or pauses an ongoing session."
+    },
+    "reset-mints": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+R",
+        "mac": "MacCtrl+R"
+      },
+      "description": "Resets mints."
     }
   },
   "manifest_version": 2

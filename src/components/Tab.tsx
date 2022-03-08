@@ -8,7 +8,6 @@ type Props = {
   label: string;
   onClick: () => void;
   isActive: boolean;
-  isDisabled: boolean;
 };
 
 const getIcon = (id: TabId) => {
@@ -24,13 +23,10 @@ const getIcon = (id: TabId) => {
   }
 };
 
-const Tab = ({ id, label, onClick, isActive, isDisabled }: Props) => {
+const Tab = ({ id, label, onClick, isActive }: Props) => {
   let bgStyle = "bg-gray-400 hover:bg-gray-500";
   if (isActive) {
     bgStyle = "bg-green-500";
-  }
-  if (isDisabled) {
-    bgStyle = "bg-gray-300 cursor-not-allowed";
   }
   const icon = getIcon(id);
 
@@ -38,7 +34,6 @@ const Tab = ({ id, label, onClick, isActive, isDisabled }: Props) => {
     <button
       className={`${bgStyle} flex-1 text-white font-semibold h-10 justify-center flex flex-col items-center`}
       onClick={onClick}
-      disabled={isDisabled}
     >
       {isActive ? (
         <div className="flex flex-col items-center text-xs">
