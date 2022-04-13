@@ -8,6 +8,7 @@ const options = () => {
   const [volume, setVolume] = useState(0.5);
   const [chime, setChime] = useState<HTMLAudioElement | null>(null);
   const [dailiesOn, setDailiesOn] = useState(false);
+  const [permablock, setPermablock] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     setChime(new Audio("sounds/chime.mp3"));
@@ -17,17 +18,20 @@ const options = () => {
         notificationPermissions: false,
         volume: 0.5,
         dailiesOn: false,
+        permablock: false,
       },
       ({
         tabPermissions: _tabPermissions,
         notificationPermissions: _notificationPermissions,
         volume: _volume,
         dailiesOn: _dailiesOn,
+        permablock: _permablock,
       }) => {
         setTabPermissions(_tabPermissions);
         setNotificationPermissions(_notificationPermissions);
         setVolume(_volume);
         setDailiesOn(_dailiesOn);
+        setPermablock(_permablock);
         setIsLoading(false);
       }
     );
@@ -70,6 +74,11 @@ const options = () => {
     setDailiesOn(dailiesOn);
     chrome.storage.sync.set({ dailiesOn });
   };
+
+  const updatePermablock = (permablock: boolean) => {
+    setPermablock(permablock);
+    chrome.storage.sync.set({ permablock });
+  }
 
   if (isLoading) {
     return (
@@ -119,6 +128,20 @@ const options = () => {
             />
             <label className="text-base" htmlFor="dailies">
               Show dailies tab in popup
+            </label>
+          </div>
+          <div>
+            <input
+              id="permablock"
+              type="checkbox"
+              className="mr-2 mb-4"
+              checked={permablock}
+              onChange={(e) => {
+                updatePermablock(e.target.checked);
+              }}
+            />
+            <label className="text-base" htmlFor="permablock">
+              Permanently block sites
             </label>
           </div>
           <div>
