@@ -19,7 +19,6 @@ const Popup = () => {
       <PopupHeader
         shopClick={() => setCurrentTab("shop")}
         inShop={currentTab == "shop"}
-        isDisabled={workState.status === "working"}
       />
       <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
         {currentTab === "work" && <WorkTab />}
@@ -34,7 +33,6 @@ const Popup = () => {
           label="Work"
           onClick={() => setCurrentTab("work")}
           isActive={currentTab === "work"}
-          isDisabled={false}
         />
 
         <Tab
@@ -42,7 +40,6 @@ const Popup = () => {
           label="Todo"
           onClick={() => setCurrentTab("todo")}
           isActive={currentTab === "todo"}
-          isDisabled={workState.status === "working"}
         />
 
         {dailiesOn && (
@@ -51,7 +48,6 @@ const Popup = () => {
             label="Dailies"
             onClick={() => setCurrentTab("dailies")}
             isActive={currentTab === "dailies"}
-            isDisabled={workState.status === "working"}
           />
         )}
       </div>

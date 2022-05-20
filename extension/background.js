@@ -7,6 +7,7 @@ let notificationPermissions = false;
 let volume = 0.5;
 let alarm = null;
 let workLength = 25 * 60 * 1_000;
+let permablock = false;
 const id = chrome.runtime.id;
 const blockUrl = `chrome-extension://${id}/out/blocked.html`;
 const chime = new Audio("../out/sounds/chime.mp3");
@@ -64,6 +65,7 @@ chrome.storage.sync.get(
     tabPermissions: false,
     notificationPermissions: false,
     volume: 0.5,
+    permablock: false,
   },
   ({
     mints: _mints,
@@ -74,6 +76,7 @@ chrome.storage.sync.get(
     tabPermissions: _tabPermissions,
     notificationPermissions: _notificationPermissions,
     volume: _volume,
+    permablock: _permablock,
   }) => {
     mints = _mints;
     lifetimeMints = _lifetimeMints;
@@ -83,6 +86,7 @@ chrome.storage.sync.get(
     tabPermissions = _tabPermissions;
     notificationPermissions = _notificationPermissions;
     volume = _volume;
+    permablock = _permablock;
 
     if (workState.status === "working") {
       const timeLeft = workState.workEndTime - Date.now();
@@ -192,6 +196,9 @@ const processAlarm = (workLengthInMinutes) => {
 chrome.commands.onCommand.addListener(function (command) {
   if (command === "toggle-work") {
     workState.status === "working" ? pauseWork() : startWork();
+  } else if (command == "reset-mints") {
+    mints = 0;
+    chrome.storage.sync.set({ mints });
   }
 });
 
@@ -242,7 +249,7 @@ const addBlockedSite = (info) => {
 };
 
 const blockSite = (tabId, url) => {
-  if (url && workState.status === "working") {
+  if (url && (workState.status === "working" || permablock)) {
     for (let i = 0; i < blockedSites.length; i++) {
       if (url.includes(blockedSites[i])) {
         chrome.tabs.update(tabId, { url: blockUrl });
